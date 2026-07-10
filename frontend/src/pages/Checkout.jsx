@@ -19,7 +19,7 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     try {
-      const orderRes = await fetch('/api/payment/order', {
+      const orderRes = await fetch(`${process.env.REACT_APP_API_URL}/api/payment/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: totalPrice })
@@ -51,7 +51,7 @@ const Checkout = () => {
               razorpay_signature: response.razorpay_signature,
             };
 
-            const verifyRes = await fetch('/api/payment/verify', {
+            const verifyRes = await fetch(`${process.env.REACT_APP_API_URL}/api/payment/verify`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
@@ -60,7 +60,7 @@ const Checkout = () => {
             const verifyData = await verifyRes.json().catch(() => ({}));
 
             if (verifyRes.ok) {
-              const saveOrderRes = await fetch('/api/orders', {
+              const saveOrderRes = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const Checkout = () => {
       return;
     }
 
-    const saveOrderRes = await fetch('/api/orders', {
+    const saveOrderRes = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
