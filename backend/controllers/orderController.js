@@ -6,29 +6,77 @@ const sendEmail = require('../utils/sendEmail');
 const createOrder = async (req, res) => {
     try {
         const { items, totalAmount, address, paymentId } = req.body;
-        if (!items || items.length === 0 || !totalAmount || !address) {
-            return res.status(400).json({ message: 'Invalid order data' });
-        }
-        else {
-            const order = new Order({
-                user: req.user._id,
-                items,
-                totalAmount,
-                address,
-                paymentId
+
+        if (
+            !items ||
+            items.length === 0 ||
+            !totalAmount ||
+            !address
+        ) {
+            return res.status(400).json({
+                message: 'Invalid order data'
             });
-            await order.save();
-            const message = `Dear ${req.user.name},\n\nThank You for your order! Your order has been created successfully reated with the following details:\n\nOrder ID: ${order._id}\nTotal Amount: $${totalAmount}\nShipping Address: ${address}\n\nWe will notify you once your order is shipped.\n\nBest regards,\nShopNest Team`;
-            try {
-                await sendEmail(req.user.email, "Order Created", message);
-                } catch (error) {
-                    console.error("Email failed:", error.message);
-                }
-            res.status(201).json({ message: 'Order created successfully', order });
         }
+
+        const order = await Order.create({
+            user: req.user._id,
+            items,
+            totalAmount,
+            address,
+            paymentId
+        });
+
+        const message = `
+Dear ${req.user.name},
+
+Thank you for your order!
+
+Your order has been created successfully.
+
+Order ID: ${order._id}
+Total Amount: ₹${totalAmount}
+
+Shipping Address:
+${address.fullName}
+${address.street}
+${address.city} - ${address.postalCode}
+${address.country}
+
+We will notify you once your order is shipped.
+
+Best regards,
+ShopNest Team
+        `;
+
+        // Intentionally not awaited.
+        // Email failure will not delay checkout or return a 500 response.
+        void sendEmail(
+            req.user.email,
+            'ShopNest Order Created',
+            message
+        )
+            .then(() => {
+                console.log(`Order email sent to ${req.user.email}`);
+            })
+            .catch((emailError) => {
+                console.error(
+                    'Order email failed:',
+                    emailError.message
+                );
+            });
+
+        return res.status(201).json({
+            message: 'Order created successfully',
+            order
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating order', error });
-    }   
+        console.error('CREATE ORDER ERROR:', error);
+
+        return res.status(500).json({
+            message: 'Error creating order',
+            error: error.message
+        });
+    }
 };
 
 const myOrders = async (req, res) => {

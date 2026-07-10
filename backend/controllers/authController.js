@@ -12,45 +12,70 @@ const generateToken = (id) => {
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
+
     try {
         const existingUser = await User.findOne({ email });
+
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({
+                message: 'User already exists'
+            });
         }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = User.create({ name, email, password: hashedPassword });
-        if(user) {
-            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // Make sure await is present here.
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword
+        });
 
-            const message = `
-            Welcome to ShopNest, ${name}!
-            Your OTP for ShopNest registration is: ${otp}`;
+        const otp = Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
 
-                try {
-                    await sendEmail(email, "Welcome to ShopNest - Your OTP for registration", message);
-                    } catch (error) {
-                        console.error("Registration email failed:", error.message);
-                    }
+        const message = `
+Welcome to ShopNest, ${user.name}!
 
-            res.status(201).json({ 
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                token: generateToken(user._id)
+Your OTP for ShopNest registration is: ${otp}
+
+Thank you for registering with ShopNest.
+        `;
+
+        // Intentionally not awaited.
+        // Registration succeeds even if the email fails.
+        void sendEmail(
+            user.email,
+            'Welcome to ShopNest - Registration OTP',
+            message
+        )
+            .then(() => {
+                console.log(`Registration email sent to ${user.email}`);
+            })
+            .catch((emailError) => {
+                console.error(
+                    'Registration email failed:',
+                    emailError.message
+                );
             });
-            
-        }
-        else {
-            res.status(400).json({ message: 'Error while creating user' });
-        }
-        
+
+        return res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id)
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('REGISTER USER ERROR:', error);
+
+        return res.status(500).json({
+            message: 'Server error',
+            error: error.message
+        });
     }
-    
 };
 
 const loginUser = async (req, res) => {
