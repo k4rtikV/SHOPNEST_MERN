@@ -28,7 +28,11 @@ const registerUser = async (req, res) => {
             Welcome to ShopNest, ${name}!
             Your OTP for ShopNest registration is: ${otp}`;
 
-            await sendEmail(email, 'Welcome to ShopNest - Your OTP for registration', message);
+                try {
+                    await sendEmail(email, "Welcome to ShopNest - Your OTP for registration", message);
+                    } catch (error) {
+                        console.error("Registration email failed:", error.message);
+                    }
 
             res.status(201).json({ 
                 _id: user._id,

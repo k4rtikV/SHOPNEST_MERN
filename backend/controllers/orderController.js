@@ -19,7 +19,11 @@ const createOrder = async (req, res) => {
             });
             await order.save();
             const message = `Dear ${req.user.name},\n\nThank You for your order! Your order has been created successfully reated with the following details:\n\nOrder ID: ${order._id}\nTotal Amount: $${totalAmount}\nShipping Address: ${address}\n\nWe will notify you once your order is shipped.\n\nBest regards,\nShopNest Team`;
-            await sendEmail(req.user.email, 'Order Created', message);
+            try {
+                await sendEmail(req.user.email, "Order Created", message);
+                } catch (error) {
+                    console.error("Email failed:", error.message);
+                }
             res.status(201).json({ message: 'Order created successfully', order });
         }
     } catch (error) {
