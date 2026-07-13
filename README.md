@@ -1,5 +1,7 @@
 # 🛍️ ShopNest MERN
 
+Deployed link (Render) - https://shopnest-mern-h3b1.onrender.com/
+
 A full-stack E-commerce web application built using the MERN Stack (MongoDB, Express.js, React.js, Node.js). ShopNest provides a modern shopping experience with secure authentication, product management, shopping cart functionality, order processing, payment integration using Razorpay Test Mode, and an admin dashboard.
 
 ---
