@@ -53,6 +53,21 @@ A full-stack E-commerce web application built using the MERN Stack (MongoDB, Exp
 ### Payment Gateway
 - Razorpay (Test Mode)
 
+🧪 Test Payment (Razorpay Test Mode)
+
+This project is currently configured to use Razorpay Test Mode for demonstration and development purposes. No real money will be charged during checkout.
+
+To complete a successful payment, choose the Card payment option and use the following test card details:
+
+Field	Value
+Card Number	6073 8400 0000 0016
+Expiry Date	Any future date (e.g. 12/30)
+CVV	Any 3 digits (e.g. 123)
+Cardholder Name	Any name
+OTP	123456
+
+Note: These are Razorpay's official test card credentials and work only while the application is configured with Razorpay Test Mode API keys. No real payment is processed.
+
 ---
 
 ## 📂 Project Structure
