@@ -2,6 +2,7 @@ const User = require('../model/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
+const { registrationOtpEmail } = require('../utils/emailTemplates');
 
 
 
@@ -36,21 +37,19 @@ const registerUser = async (req, res) => {
             100000 + Math.random() * 900000
         ).toString();
 
-        const message = `
-Welcome to ShopNest, ${user.name}!
-
-Your OTP for ShopNest registration is: ${otp}
-
-Thank you for registering with ShopNest.
-        `;
+        const registrationEmail = registrationOtpEmail({
+            name: user.name,
+            otp
+        });
 
         // Intentionally not awaited.
         // Registration succeeds even if the email fails.
-        void sendEmail(
-            user.email,
-            'Welcome to ShopNest - Registration OTP',
-            message
-        )
+        void sendEmail({
+            to: user.email,
+            subject: registrationEmail.subject,
+            text: registrationEmail.text,
+            html: registrationEmail.html
+        })
             .then(() => {
                 console.log(`Registration email sent to ${user.email}`);
             })

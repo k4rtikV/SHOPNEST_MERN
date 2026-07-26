@@ -1,6 +1,7 @@
 const Order = require('../model/Order');
 
 const sendEmail = require('../utils/sendEmail');
+const { orderCreatedEmail } = require('../utils/emailTemplates');
 
 //new order
 const createOrder = async (req, res) => {
@@ -26,35 +27,21 @@ const createOrder = async (req, res) => {
             paymentId
         });
 
-        const message = `
-Dear ${req.user.name},
+        await order.populate('items.productId', 'name');
 
-Thank you for your order!
-
-Your order has been created successfully.
-
-Order ID: ${order._id}
-Total Amount: ₹${totalAmount}
-
-Shipping Address:
-${address.fullName}
-${address.street}
-${address.city} - ${address.postalCode}
-${address.country}
-
-We will notify you once your order is shipped.
-
-Best regards,
-ShopNest Team
-        `;
+        const orderEmail = orderCreatedEmail({
+            customerName: req.user.name,
+            order
+        });
 
         // Intentionally not awaited.
         // Email failure will not delay checkout or return a 500 response.
-        void sendEmail(
-            req.user.email,
-            'ShopNest Order Created',
-            message
-        )
+        void sendEmail({
+            to: req.user.email,
+            subject: orderEmail.subject,
+            text: orderEmail.text,
+            html: orderEmail.html
+        })
             .then(() => {
                 console.log(`Order email sent to ${req.user.email}`);
             })
