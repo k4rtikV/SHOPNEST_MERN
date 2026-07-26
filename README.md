@@ -48,7 +48,7 @@ A full-stack E-commerce web application built using the MERN Stack (MongoDB, Exp
 - BcryptJS
 - Multer
 - Cloudinary
-- Nodemailer
+- Brevo email service
 
 ### Payment Gateway
 - Razorpay (Test Mode)
@@ -111,9 +111,9 @@ MONGO_URI=your_mongodb_connection_string
 
 JWT_SECRET=your_jwt_secret
 
-EMAIL_USER=your_email
-
-EMAIL_PASS=your_email_password
+BREVO_API_KEY=your_brevo_api_key
+BREVO_SENDER_NAME=ShopNest
+BREVO_SENDER_EMAIL=your_verified_sender_email
 
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
